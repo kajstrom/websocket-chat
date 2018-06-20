@@ -2,7 +2,11 @@
 
 generated using Luminus version "2.9.12.64"
 
-FIXME
+## Todo
+
+- Display participants from an atom
+- Display messages from an atom
+- Web Socket communication with the server
 
 ## Prerequisites
 
