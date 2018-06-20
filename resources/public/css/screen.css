@@ -67,3 +67,10 @@ body {
     }
 }
 
+.chat-area {
+    max-height: 90%;
+}
+
+.typing-area {
+    max-height: 10%
+}

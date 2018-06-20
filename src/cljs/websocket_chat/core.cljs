@@ -5,46 +5,22 @@
             [markdown.core :refer [md->html]]
             [websocket-chat.ajax :refer [load-interceptors!]]
             [ajax.core :refer [GET POST]]
-            [secretary.core :as secretary :include-macros true])
+            [secretary.core :as secretary :include-macros true]
+            [websocket-chat.components.chat :refer [message-form]])
   (:import goog.History))
 
-(defonce session (r/atom {:page :home}))
+(defonce session (r/atom {:page :chat}))
 
-(defn nav-link [uri title page]
-  [:li.nav-item
-   {:class (when (= page (:page @session)) "active")}
-   [:a.nav-link {:href uri} title]])
-
-(defn navbar []
-  [:nav.navbar.navbar-dark.bg-primary.navbar-expand-md
-   {:role "navigation"}
-   [:button.navbar-toggler.hidden-sm-up
-    {:type "button"
-     :data-toggle "collapse"
-     :data-target "#collapsing-navbar"}
-    [:span.navbar-toggler-icon]]
-   [:a.navbar-brand {:href "#/"} "websocket-chat"]
-   [:div#collapsing-navbar.collapse.navbar-collapse
-    [:ul.nav.navbar-nav.mr-auto
-     [nav-link "#/" "Home" :home]
-     [nav-link "#/about" "About" :about]]]])
-
-(defn about-page []
-  [:div.container
-   [:div.row
-    [:div.col-md-12
-     [:img {:src "/img/warning_clojure.png"}]]]])
-
-(defn home-page []
-  [:div.container
-   (when-let [docs (:docs @session)]
-     [:div.row>div.col-sm-12
-      [:div {:dangerouslySetInnerHTML
-             {:__html (md->html docs)}}]])])
+(defn chat-page []
+  [:div.container-fluid
+   [:div.row.chat-area
+    [:div.col-10 "Chat"]
+    [:div.col-2 "Participants"]]
+   [:div.row.typing-area
+    [message-form]]])
 
 (def pages
-  {:home #'home-page
-   :about #'about-page})
+  {:chat #'chat-page})
 
 (defn page []
   [(pages (:page @session))])
@@ -55,7 +31,7 @@
 (secretary/set-config! :prefix "#")
 
 (secretary/defroute "/" []
-  (swap! session assoc :page :home))
+  (swap! session assoc :page :chat))
 
 (secretary/defroute "/about" []
   (swap! session assoc :page :about))
@@ -73,15 +49,10 @@
 
 ;; -------------------------
 ;; Initialize app
-(defn fetch-docs! []
-  (GET "/docs" {:handler #(swap! session assoc :docs %)}))
 
 (defn mount-components []
-  (r/render [#'navbar] (.getElementById js/document "navbar"))
   (r/render [#'page] (.getElementById js/document "app")))
 
 (defn init! []
-  (load-interceptors!)
-  (fetch-docs!)
   (hook-browser-navigation!)
   (mount-components))
