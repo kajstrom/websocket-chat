@@ -22,3 +22,11 @@
         [:button.btn.btn-primary {:on-click #(do
                                               (send-message! messages (:message @fields))
                                               (reset! fields {:message ""}))} "Send"]]])))
+
+(defn participant-list [participants]
+  (let [participants @participants]
+    [:div [:h4 "Participants"]
+     [:ul.list-group.list-group-flush
+      (for [participant participants]
+        ^{:key (:id participant)} [:li.list-group-item
+                                   (:name participant)])]]))

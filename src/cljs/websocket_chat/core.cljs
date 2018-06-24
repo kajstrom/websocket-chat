@@ -6,18 +6,19 @@
             [websocket-chat.ajax :refer [load-interceptors!]]
             [ajax.core :refer [GET POST]]
             [secretary.core :as secretary :include-macros true]
-            [websocket-chat.components.chat :refer [message-form message-area]]
+            [websocket-chat.components.chat :refer [message-form message-area participant-list]]
             [cljs-time.core :as ct])
   (:import goog.History))
 
 (defonce session (r/atom {:page :chat}))
 (defonce messages (r/atom [{:id 0 :user "Kaj" :message "Hello world!" :time (ct/now)}]))
+(defonce participants (r/atom [{:id 0 :name "Kaj"}]))
 
 (defn chat-page []
   [:div.container-fluid
    [:div.row.chat-area
     [:div.col-10 [message-area messages]]
-    [:div.col-2 "Participants"]]
+    [:div.col-2 [participant-list participants]]]
    [:div.row.typing-area
     [message-form messages]]])
 

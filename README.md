@@ -4,7 +4,6 @@ generated using Luminus version "2.9.12.64"
 
 ## Todo
 
-- Display participants from an atom
 - Web Socket communication with the server
 
 ## Prerequisites
