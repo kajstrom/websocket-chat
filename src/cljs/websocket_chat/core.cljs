@@ -24,7 +24,11 @@
 
 (defn chat-page []
   (swap! session assoc :modal (signup-form session participants))
+<<<<<<< HEAD
   (start-router! {:chat/participants-updated participants-updated})
+=======
+  (start-router!)
+>>>>>>> 87a201185c5c33e69a0df9dfaddbd03c06794ff1
   [:div.container-fluid
    [modal]
    [:div.row.chat-area
