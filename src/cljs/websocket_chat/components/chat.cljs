@@ -1,5 +1,6 @@
 (ns websocket-chat.components.chat
   (:require [reagent.core :refer [atom]]
+            [websocket-chat.components.common :as c]
             [cljs-time.core :as ct]
             [cljs-time.format :as cf]))
 
@@ -30,3 +31,21 @@
       (for [participant participants]
         ^{:key (:id participant)} [:li.list-group-item
                                    (:name participant)])]]))
+
+(defn signup-form [session participants]
+  (let [fields (atom {})]
+    (fn []
+      [c/modal
+       [:div "Enter username"]
+       [:div
+        [:div.form-group
+         [:label "Name"]
+         [:input.form-control {:name "name"
+                               :type "text"
+                               :on-change #(swap! fields assoc :name (-> % .-target .-value))
+                               :placeholder "Name visible for other users"
+                               }]]]
+       [:div
+        [:button.btn.btn-primary {:on-click (fn [] (do
+                                                     (swap! session dissoc :modal)
+                                                     (swap! participants conj {:id (count @participants) :name (:name @fields)})))} "Enter Chat"]]])))
