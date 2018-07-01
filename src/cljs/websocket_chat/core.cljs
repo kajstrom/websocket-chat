@@ -7,6 +7,7 @@
             [ajax.core :refer [GET POST]]
             [secretary.core :as secretary :include-macros true]
             [websocket-chat.components.chat :refer [message-form message-area participant-list signup-form]]
+            [websocket-chat.ws :refer [start-router!]]
             [cljs-time.core :as ct])
   (:import goog.History))
 
@@ -20,6 +21,7 @@
 
 (defn chat-page []
   (swap! session assoc :modal (signup-form session participants))
+  (start-router!)
   [:div.container-fluid
    [modal]
    [:div.row.chat-area

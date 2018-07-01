@@ -4,7 +4,9 @@ generated using Luminus version "2.9.12.64"
 
 ## Todo
 
-- Web Socket communication with the server
+- Find a better way to update participants atom. Perhaps pass the handler functions from outside ws.cljs
+- Update participants when someone leaves the chat.
+- Messages via Websocket
 
 ## Prerequisites
 

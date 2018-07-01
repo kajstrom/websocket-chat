@@ -2,6 +2,7 @@
   (:require 
             [websocket-chat.layout :refer [error-page]]
             [websocket-chat.routes.home :refer [home-routes]]
+            [websocket-chat.routes.ws :refer [ws-routes]]
             [compojure.core :refer [routes wrap-routes]]
             [compojure.route :as route]
             [websocket-chat.env :refer [defaults]]
@@ -19,6 +20,9 @@
       (-> #'home-routes
           (wrap-routes middleware/wrap-csrf)
           (wrap-routes middleware/wrap-formats))
+          (-> ws-routes
+              ring.middleware.keyword-params/wrap-keyword-params
+              ring.middleware.params/wrap-params)
           (route/not-found
              (:body
                (error-page {:status 404

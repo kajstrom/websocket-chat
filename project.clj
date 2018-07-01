@@ -30,7 +30,8 @@
                  [ring/ring-defaults "0.3.2"]
                  [secretary "1.2.3"]
                  [selmer "1.11.7"]
-                 [com.andrewmcveigh/cljs-time "0.5.2"]]
+                 [com.andrewmcveigh/cljs-time "0.5.2"]
+                 [com.taoensso/sente "1.12.0"]]
 
   :min-lein-version "2.0.0"
   
