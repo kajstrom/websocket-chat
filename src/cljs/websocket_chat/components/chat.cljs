@@ -1,6 +1,7 @@
 (ns websocket-chat.components.chat
   (:require [reagent.core :refer [atom]]
             [websocket-chat.components.common :as c]
+            [websocket-chat.ws :refer [join-chat!]]
             [cljs-time.core :as ct]
             [cljs-time.format :as cf]))
 
@@ -48,4 +49,4 @@
        [:div
         [:button.btn.btn-primary {:on-click (fn [] (do
                                                      (swap! session dissoc :modal)
-                                                     (swap! participants conj {:id (count @participants) :name (:name @fields)})))} "Enter Chat"]]])))
+                                                     (join-chat! (:name @fields))))} "Enter Chat"]]])))
