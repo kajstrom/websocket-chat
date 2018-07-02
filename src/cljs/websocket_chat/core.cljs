@@ -8,7 +8,8 @@
             [secretary.core :as secretary :include-macros true]
             [websocket-chat.components.chat :refer [message-form message-area participant-list signup-form]]
             [websocket-chat.ws :refer [start-router!]]
-            [cljs-time.core :as ct])
+            [cljs-time.core :as ct]
+            [cljs-time.format :as f])
   (:import goog.History))
 
 (defonce session (r/atom {:page :chat}))
@@ -18,13 +19,19 @@
 (defn participants-updated [new-participants]
   (reset! participants new-participants))
 
+(defn receive-message [new-message]
+  (let [msg (assoc new-message :time (f/parse (f/formatters :basic-date-time) (:time new-message)))]
+    (swap! messages conj msg)))
+
 (defn modal[]
   (when-let [session-modal (:modal @session)]
     [session-modal]))
 
 (defn chat-page []
   (swap! session assoc :modal (signup-form session participants))
-  (start-router! {:chat/participants-updated participants-updated})
+  (start-router! {
+                   :chat/participants-updated participants-updated
+                   :chat/new-message receive-message})
   [:div.container-fluid
    [modal]
    [:div.row.chat-area

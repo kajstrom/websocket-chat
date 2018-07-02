@@ -5,7 +5,6 @@ generated using Luminus version "2.9.12.64"
 ## Todo
 
 - Update participants when someone leaves the chat.
-- Messages via Websocket (remove hardcoding for name "Kaj")
 
 ## Prerequisites
 

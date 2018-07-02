@@ -2,7 +2,9 @@
   (:require [taoensso.sente :as sente]
             [taoensso.sente.server-adapters.immutant :refer (get-sch-adapter)]
             [compojure.core :refer [defroutes GET POST]]
-            [mount.core :refer [defstate]]))
+            [mount.core :refer [defstate]]
+            [clj-time.core :as t]
+            [clj-time.format :as f]))
 
 (defonce participants (atom []))
 
@@ -23,6 +25,15 @@
     (println @participants)
     (doseq [uid (:any @connected-uids)]
       (chsk-send! uid [:chat/participants-updated @participants]))
+    true)
+  (when (= id :chat/message)
+    (let [message (assoc ?data
+                         :id (.toString (java.util.UUID/randomUUID))
+                         :time (f/unparse (f/formatter :basic-date-time) (t/now))
+                         :user (:name (first (filter #(= client-id (:id %)) @participants))))]
+      (println message)
+      (doseq [uid (:any @connected-uids)]
+        (chsk-send! uid [:chat/new-message message])))
     true))
 
 (defn stop-router! [stop-fn]

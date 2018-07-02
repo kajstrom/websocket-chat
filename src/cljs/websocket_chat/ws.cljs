@@ -25,6 +25,7 @@
   (let [[id data] (second (:event ev-msg))]
     (case id
       :chat/participants-updated ((:chat/participants-updated handlers) data)
+      :chat/new-message ((:chat/new-message handlers) data)
       (.log js/console id data))))
 
 (defn event-msg-handler [& [{:keys [handlers state handshake]
@@ -53,5 +54,10 @@
 
 (defn join-chat! [name]
   (chsk-send! [:chat/join {:name name}] 8000
+              (fn [reply]
+                (println reply))))
+
+(defn send-message! [message]
+  (chsk-send! [:chat/message message] 8000
               (fn [reply]
                 (println reply))))
