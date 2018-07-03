@@ -4,7 +4,8 @@
             [compojure.core :refer [defroutes GET POST]]
             [mount.core :refer [defstate]]
             [clj-time.core :as t]
-            [clj-time.format :as f]))
+            [clj-time.format :as f]
+            [clojure.data :refer [diff]]))
 
 (defonce participants (atom []))
 
@@ -27,7 +28,7 @@
 (add-watch connected-uids :connected-uids
            (fn [_ _ old new]
              (when (not= new old)
-               (if-let [disconnected (second (clojure.data/diff (:any new) (:any old)))]
+               (if-let [disconnected (second (diff (:any new) (:any old)))]
                  (doseq [uid disconnected]
                    (swap! participants (fn [participants] (filter #(not= uid (:id %)) participants)))
                    (broadcast-participants-change))))))
