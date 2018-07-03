@@ -19,22 +19,25 @@
   (def chsk-send! send-fn)
   (def connected-uids connected-uids))
 
+(defn broadcast-participants-change []
+  (let [participants @participants]
+    (doseq [uid (:any @connected-uids)]
+    (chsk-send! uid [:chat/participants-updated participants]))))
+
 (add-watch connected-uids :connected-uids
            (fn [_ _ old new]
              (when (not= new old)
                (if-let [disconnected (second (clojure.data/diff (:any new) (:any old)))]
                  (doseq [uid disconnected]
                    (swap! participants (fn [participants] (filter #(not= uid (:id %)) participants)))
-                   (doseq [uid (:any @connected-uids)]
-                     (chsk-send! uid [:chat/participants-updated @participants])))))))
+                   (broadcast-participants-change))))))
 
 (defn handle-message! [{:keys [id client-id ?data]}]
   (when (= id :chat/join)
     (let [participant (assoc ?data :id client-id :name (:name ?data))]
       (swap! participants conj participant))
     (println @participants)
-    (doseq [uid (:any @connected-uids)]
-      (chsk-send! uid [:chat/participants-updated @participants]))
+    (broadcast-participants-change)
     true)
   (when (= id :chat/message)
     (let [message (assoc ?data
