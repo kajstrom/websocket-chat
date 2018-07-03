@@ -1,10 +1,12 @@
 # websocket-chat
 
+WebSocket chat using Luminus, Reagent and Sente.
+
 generated using Luminus version "2.9.12.64"
 
 ## Todo
 
-- Update participants when someone leaves the chat.
+???
 
 ## Prerequisites
 
