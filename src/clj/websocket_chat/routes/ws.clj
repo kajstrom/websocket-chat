@@ -33,22 +33,26 @@
                    (swap! participants (fn [participants] (filter #(not= uid (:id %)) participants)))
                    (broadcast-participants-change))))))
 
+(defn join-handler! [id client-id ?data]
+  (let [participant (assoc ?data :id client-id :name (:name ?data))]
+    (swap! participants conj participant))
+  (println @participants)
+  (broadcast-participants-change))
+
+(defn chat-message-handler! [id client-id ?data]
+  (let [message (assoc ?data
+                       :id (.toString (java.util.UUID/randomUUID))
+                       :time (f/unparse (f/formatter :basic-date-time) (t/now))
+                       :user (:name (first (filter #(= client-id (:id %)) @participants))))]
+    (println message)
+    (doseq [uid (:any @connected-uids)]
+      (chsk-send! uid [:chat/new-message message]))))
+
 (defn handle-message! [{:keys [id client-id ?data]}]
-  (when (= id :chat/join)
-    (let [participant (assoc ?data :id client-id :name (:name ?data))]
-      (swap! participants conj participant))
-    (println @participants)
-    (broadcast-participants-change)
-    true)
-  (when (= id :chat/message)
-    (let [message (assoc ?data
-                         :id (.toString (java.util.UUID/randomUUID))
-                         :time (f/unparse (f/formatter :basic-date-time) (t/now))
-                         :user (:name (first (filter #(= client-id (:id %)) @participants))))]
-      (println message)
-      (doseq [uid (:any @connected-uids)]
-        (chsk-send! uid [:chat/new-message message])))
-    true))
+  (case id
+    :chat/join (join-handler! id client-id ?data)
+    :chat/message (chat-message-handler! id client-id ?data)
+    (println "Unhandled message" id)))
 
 (defn stop-router! [stop-fn]
   (when stop-fn (stop-fn)))
