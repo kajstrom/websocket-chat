@@ -2,7 +2,9 @@
   (:require-macros
     [cljs.core.async.macros :as asyncm :refer (go go-loop)])
   (:require [cljs.core.async :as async :refer [<! >! put! chan]]
-            [taoensso.sente :as sente :refer [cb-success?]]))
+            [taoensso.sente :as sente :refer [cb-success?]]
+            [struct.core :as st]
+            [websocket-chat.validation :refer [participant-scheme]]))
 
 (let [{:keys [chsk ch-recv send-fn state]}
       (sente/make-channel-socket! "/chsk"
@@ -11,6 +13,9 @@
   (def ch-chsk ch-recv) ;Receive channel
   (def chsk-send! send-fn)
   (def chsk-state state))
+
+(defn console-log [v]
+  (.log js/console v))
 
 (defn state-handler [{:keys [?data]}]
   (.log js/console (str "state changed: " ?data)))
@@ -52,10 +57,20 @@
                      :state state-handler
                     :handshake handshake-handler}))))
 
-(defn join-chat! [name]
-  (chsk-send! [:chat/join {:name name}] 8000
-              (fn [reply]
-                (println reply))))
+(defn join-chat! [name errors session]
+  (let [participant {:name name}]
+    (if-let [error-messages (first (st/validate participant participant-scheme))]
+      (do
+        (.log js/console error-messages)
+        (reset! errors error-messages))
+      (chsk-send! [:chat/join {:name name}] 8000
+                  (fn [reply]
+                    (if-not (:errors reply)
+                      (do
+                        (console-log reply)
+                        (reset! errors nil)
+                        (swap! session dissoc :modal))
+                      (reset! errors (:errors reply))))))))
 
 (defn send-message! [message]
   (chsk-send! [:chat/message message] 8000

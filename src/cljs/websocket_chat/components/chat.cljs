@@ -5,6 +5,11 @@
             [cljs-time.core :as ct]
             [cljs-time.format :as cf]))
 
+(defn errors-component [errors id]
+  (.log js/console @errors id)
+  (when-let [error (id @errors)]
+    [:div.alert.alert-danger error]))
+
 (defn message-area [messages]
     (let [messages @messages]
       [:ul.list-group.list-group-flush
@@ -31,7 +36,8 @@
                                    (:name participant)])]]))
 
 (defn signup-form [session participants]
-  (let [fields (atom {})]
+  (let [fields (atom {})
+        errors (atom nil)]
     (fn []
       [c/modal
        [:div "Enter username"]
@@ -42,8 +48,8 @@
                                :type "text"
                                :on-change #(swap! fields assoc :name (-> % .-target .-value))
                                :placeholder "Name visible for other users"
-                               }]]]
+                               }]
+         [errors-component errors :name]]]
        [:div
         [:button.btn.btn-primary {:on-click (fn [] (do
-                                                     (swap! session dissoc :modal)
-                                                     (join-chat! (:name @fields))))} "Enter Chat"]]])))
+                                                     (join-chat! (:name @fields) errors session)))} "Enter Chat"]]])))

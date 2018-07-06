@@ -5,7 +5,9 @@
             [mount.core :refer [defstate]]
             [clj-time.core :as t]
             [clj-time.format :as f]
-            [clojure.data :refer [diff]]))
+            [clojure.data :refer [diff]]
+            [struct.core :as st]
+            [websocket-chat.validation :refer [participant-scheme]]))
 
 (defonce participants (atom []))
 
@@ -33,11 +35,14 @@
                    (swap! participants (fn [participants] (filter #(not= uid (:id %)) participants)))
                    (broadcast-participants-change))))))
 
-(defn join-handler! [id client-id ?data]
-  (let [participant (assoc ?data :id client-id :name (:name ?data))]
-    (swap! participants conj participant))
-  (println @participants)
-  (broadcast-participants-change))
+(defn join-handler! [id client-id ?data ?reply-fn]
+  (if-let [errors (first (st/validate ?data participant-scheme))]
+    (?reply-fn {:errors errors})
+    (let [participant (assoc ?data :id client-id :name (:name ?data))]
+      (swap! participants conj participant)
+      (println @participants)
+      (broadcast-participants-change)
+      (?reply-fn :chsk/close))))
 
 (defn chat-message-handler! [id client-id ?data]
   (let [message (assoc ?data
@@ -48,9 +53,9 @@
     (doseq [uid (:any @connected-uids)]
       (chsk-send! uid [:chat/new-message message]))))
 
-(defn handle-message! [{:keys [id client-id ?data]}]
+(defn handle-message! [{:keys [id client-id ?data ?reply-fn]}]
   (case id
-    :chat/join (join-handler! id client-id ?data)
+    :chat/join (join-handler! id client-id ?data ?reply-fn)
     :chat/message (chat-message-handler! id client-id ?data)
     (println "Unhandled message" id)))
 
