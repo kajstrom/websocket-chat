@@ -10,12 +10,20 @@
   (when-let [error (id @errors)]
     [:div.alert.alert-danger error]))
 
+(defn format-time [time]
+  "Converts UTC time to local time"
+  (->> (.getTimezoneOffset (js/Date.))
+         (-)
+      (ct/minutes)
+      (ct/plus time)
+      (cf/unparse (:date-hour-minute-second cf/formatters))))
+
 (defn message-area [messages]
     (let [messages @messages]
       [:ul.list-group.list-group-flush
        (for [message messages]
          ^{:key (:id message)} [:li.list-group-item
-                                (cf/unparse (:date-hour-minute-second cf/formatters) (:time message)) " :: " (:user message) " - " (:message message)])]))
+                                (format-time (:time message)) " :: " (:user message) " - " (:message message)])]))
 
 (defn message-form [messages]
   (let [fields (atom {:message ""})]
