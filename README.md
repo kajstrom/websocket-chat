@@ -6,7 +6,7 @@ generated using Luminus version "2.9.12.64"
 
 ## Todo
 
-???
+- Scroll chat to bottom when a new message is received
 
 ## Prerequisites
 

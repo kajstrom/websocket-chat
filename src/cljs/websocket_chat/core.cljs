@@ -32,11 +32,11 @@
   (start-router! {
                    :chat/participants-updated participants-updated
                    :chat/new-message receive-message})
-  [:div.container-fluid
+  [:div.container-fluid.h-100
    [modal]
    [:div.row.chat-area
-    [:div.col-10 [message-area messages]]
-    [:div.col-2 [participant-list participants]]]
+    [:div.col-10.chat-area-messages [message-area messages]]
+    [:div.col-2.chat-area-participants [participant-list participants]]]
    [:div.row.typing-area
     [message-form messages]]])
 

@@ -68,9 +68,14 @@ body {
 }
 
 .chat-area {
-    max-height: 90%;
+    height: 80%;
+}
+
+.chat-area-messages, .chat-area-participants {
+    height: 100%;
+    overflow: auto;
 }
 
 .typing-area {
-    max-height: 10%
+    height: 20%;
 }

@@ -30,10 +30,10 @@
     (fn []
       [:div.col-12
        [:div.form-group
-        [:textarea.form-control {:rows 2 :value (:message @fields) :on-change #(swap! fields assoc :message (-> % .-target .-value))}]
-        [:button.btn.btn-primary {:on-click #(do
-                                              (send-message! {:message (:message @fields)})
-                                              (reset! fields {:message ""}))} "Send"]]])))
+        [:textarea.form-control {:rows 2 :value (:message @fields) :on-change #(swap! fields assoc :message (-> % .-target .-value))}]]
+       [:button.btn.btn-primary {:on-click #(do
+                                             (send-message! {:message (:message @fields)})
+                                             (reset! fields {:message ""}))} "Send"]])))
 
 (defn participant-list [participants]
   (let [participants @participants]
